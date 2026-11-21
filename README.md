@@ -48,19 +48,21 @@ For add/subtract, the assignment treats operands as six-bit unsigned values. Imp
 
 ## What the VHDL files contain
 
-`sim.vhd` is the supplied **starter template**, not a completed ALU. It preserves the original placeholder architectures and example benches. The completed design is in `alu.vhd`; the self-checking testbench is in `alu_testbench.vhd`. The latter checks every select value for each required operand pair and raises an assertion error if an output differs from the expected result.
+`sim.vhd` is the supplied **starter template**, not a completed ALU. It preserves the original placeholder architectures and example benches. The completed design is split into one module per file: `adder.vhd`, `shifter.vhd`, `mult.vhd`, and `logicunit.vhd`. `alu.vhd` contains only the wrapper. `alu_testbench.vhd` checks every select value for each required operand pair and raises an assertion error if an output differs from the expected result.
 
-Use `alu.vhd` and `alu_testbench.vhd` for your Vivado project. Do not also add `sim.vhd` as a design source in that project, because it declares the same design-unit names as `alu.vhd`. Keep `sim.vhd` as the supplied reference. The testbench checks the PDF's operations directly, including unsigned subtraction borrow and signed arithmetic right shift.
+Add the split design files to Vivado, not `sim.vhd`; the starter file redeclares the same design units. Keep `sim.vhd` as a reference for the original interface and stimulus examples. The self-checking testbench covers unsigned subtraction borrow and signed arithmetic right shift as specified in the PDF.
 
 ## Vivado step by step
 
 1. Create a new **RTL Project** in Vivado. Select the FPGA board/device required by your course. The PDF's final page maps logical I/O to switches and LEDs, but does not provide FPGA package pin names.
-2. Add `alu.vhd` as a VHDL **Design Source**. It contains the adder, multiplier, logic unit, shifter, and structural ALU wrapper, implemented with basic `numeric_std` arithmetic and shift functions.
-3. Add `alu_testbench.vhd` under **Simulation Sources** and set `alu_testbench` as the simulation top. Run **Run Behavioral Simulation**. Each of the 48 select/vector cases is checked with an assertion; a mismatch is reported as an error, and a passing run reports that all vectors passed.
-4. If you want to study the starter examples, consult `sim.vhd` and `design template.txt`; do not add `sim.vhd` as a design source alongside `alu.vhd`, because they define duplicate entities. You can also simulate individual blocks by adapting the original benches.
-5. For hardware demonstration, connect the top-level ports as the PDF specifies: `sel` to switches 15–12, `a` to switches 11–6, `b` to switches 5–0, and `r` to LEDs 5–0.
-6. Create an `.xdc` using the master constraints file for the exact board/revision. Assign the switch and LED logical ports to their actual FPGA package pins and set the board-required I/O standards. The PDF does not identify the board or list package pin names, so those assignments cannot safely be filled in from the provided files alone.
-7. Synthesize/program the board for the demo. The assignment explicitly says **not** to collect timing results.
+2. Add `adder.vhd` as a **Design Source**. Read its short comments and trace the widened sum and two's-complement subtraction to understand how it produces result, carry, and borrow.
+3. Add `shifter.vhd` and simulate/inspect the three shift modes. It uses the low three bits of the top-level `b` operand as the shift amount.
+4. Add `mult.vhd` and `logicunit.vhd`, then inspect their `sel` behavior against the select table above.
+5. Add `alu.vhd` last. It instantiates those four units and routes the result based on `sel(3 downto 2)`. Vivado can resolve the direct entity instantiations once all five design files are in the project.
+6. Add `alu_testbench.vhd` under **Simulation Sources** and set `alu_testbench` as the simulation top. Run **Run Behavioral Simulation**. Each of the 48 select/vector cases is checked with an assertion; a mismatch is reported as an error, and a passing run reports that all vectors passed. The original separate benches are in `sim.vhd` for reference, but do not add that combined starter file because it redeclares the design entities.
+7. For hardware demonstration, connect the top-level ports as the PDF specifies: `sel` to switches 15–12, `a` to switches 11–6, `b` to switches 5–0, and `r` to LEDs 5–0.
+8. Create an `.xdc` using the master constraints file for the exact board/revision. Assign the switch and LED logical ports to their actual FPGA package pins and set the board-required I/O standards. The PDF does not identify the board or list package pin names, so those assignments cannot safely be filled in from the provided files alone.
+9. Synthesize/program the board for the demo. The assignment explicitly says **not** to collect timing results.
 
 Keep the implementation at the level of the course examples: one-bit carry signals, widened unsigned arithmetic, `case`/`with-select` muxes, simple bitwise operations, and the built-in shift operations. No advanced arithmetic architecture is needed.
 
@@ -70,6 +72,10 @@ Keep the implementation at the level of the course examples: one-bit carry signa
 - `Lab3_Notes-1-1.txt` — notes on the required units and arithmetic/shifting.
 - `design template.txt` — supplied VHDL interfaces and architecture placeholders.
 - `sim.vhd` — supplied placeholders and original simulation benches.
-- `alu.vhd` — completed synthesizable VHDL implementation of all four units and the wrapper.
+- `adder.vhd` — adder and subtractor.
+- `shifter.vhd` — logical/arithmetic shifter.
+- `mult.vhd` — low/high six-bit multiplier.
+- `logicunit.vhd` — bitwise logic unit.
+- `alu.vhd` — structural top-level wrapper.
 - `alu_testbench.vhd` — self-checking testbench for all required inputs and operations.
 - `lab3_example_for_adder.txt` — worked adder/subtractor example.
