@@ -1,0 +1,162 @@
+Lab3
+
+Example for Adder:
+
+
+a = 4 : 000100 (6-bit)
+b = 2 : 000010 (6-bit)
+
+
+
+Control signals:
+sel has 4 bits with 4 cases:
+
+sel :" 00" =>>> Addition :a+b
+
+sel :" 01" =>>> addition's carry
+
+sel :" 10" =>>> subtraction : a + (-b) = a - b
+
+sel :" 11" =>>> subtract's borrow
+
+
+
+* for case 1 and 2 : op1_long
+
+_ CASE1: sel = "00">>> ADDITION >>>>>> r= sum
+
+sub ( MSB of sel)  = 0
+carry_sel (LSB of sel) = 0
+
+
+
+Internal signals:
+a_long = '0' & a  (7-bit) = 0 & 000100 = 0000100
+b_long =  '0' & b (7-bit) = 0 & 000010 = 0000010
+
+
+op1_long = a_long + b_long = 0000100 + 0000010 = 0000110 (7-bit)
+op2_long = op1_ long:  a_long + b_long
+
+
+
+
+carry_out =  carry_long = "000000" & op1_long(6)= "000000" & 0  = 0000000    (7-bit)
+carry = lower 6-bits of carry_long = 000000 (6-bit)
+
+
+
+sum_long = op1_long = 0000110 (7-bit)
+sum = lower 6-bits of  sum_long (6-bit) = 000110
+
+r (output) = lower bit of sum 000110 (6-bit)
+
+
+-----------------------------------------------------------
+CASE2 sel = "01" >>> r = addition carry
+
+a = 000100 (6-bit)
+b = 000010 (6-bit)
+
+sub ( MSB of sel)  = 0
+carry_sel (LSB of sel) = 1
+
+
+Internal signals:
+
+a_long = '0' & a = '0' & a = 0000100   (7-bit)
+b_long = '0' & b = 0000010  (7-bit)
+
+
+op1_long = a_long + b_long  = 0000100 + 0000010 = 0000110 (7-bit)
+op2_long = op1_long
+
+
+ carry_out =  carry_long = "000000" & op1_long(6)= "000000" & 0 = 0000000 (7-bit)
+carry = lower 6-bits of carry_long =the lower 6-bit of carry_long = 000000  (6-bit)
+
+sum_long = op1_long = 0000110 (7-bit)
+sum = lower 6-bits of  sum_long (6-bit) = 000110
+
+r = output = "000000" & carry
+
+
+
+-------------------------------------------------------
+* for case 3 nd 4: op2_long
+
+
+CASE3 sel = "10" >>> r (output) = lower 6-bits of subtraction a - b = a + (-b) : two's complement
+
+sub = 1
+carry_sel = 0
+
+
+a=000100
+b=000010
+(-b) = 111101
+
+
+a_long = '0' & a = '0' & a = 0000100   (7-bit)
+b_long = '0' & not(b) = 0 & 111101 = 0111101   (7-bit)
+
+
+op1_long = a_long + b_long = 0000100 + 0111101 = 1000001 (dec:65)  (7-bit)
+op2_long = op1_long +1 = 1000001 + 1 = 1000010 (dec:66)  (7-bit) : a + two's complement of b
+
+
+
+
+carry_out =carry_long="000000" & op2_long(6) = 000000 & 1 = 0000001 (7-bit)
+carry= lower 6 bits of carry_long = 000001 (6-bit)
+
+sum_long = op2_long = 1000010
+sum = lower 6-bit of sum_long = 000010
+
+r output (6 bit) = "00000" & carry(0) = "00000" & '1' = 0000001
+
+
+-----------------------------------------------------
+
+
+CASE4 sel = "11" >>>>> subtraction borrow  >>> r (output borrow) = carry
+
+sub = 1
+carry_sel = 1
+
+a=000100
+b=000010
+(-b) = 111101
+
+
+a_long = '0' & a = '0' & a = 0000100   (7-bit)
+b_long = '0' & not(b) = 0 & 111101 = 0111101   (7-bit)
+
+
+op1_long = a_long + b_long = 0000100 + 0111101 = 1000001 (dec:65)  (7-bit)
+op2_long = op1_long +1 = 1000001 + 1 = 1000010 (dec:66)  (7-bit) : a + two's complement of b
+
+
+sum_long = op2_long = 1000010
+sum = lower 6-bit of sum_long = 000010
+
+
+carry_out =carry_long="000000" & op2_long(6) = 000000 & 1 = 0000001 (7-bit)
+carry= lower 6 bits of carry_long = 000001 (6-bit)
+
+
+r = carry = "00000" & '1' = 000001 (6-bit)
+
+-----------------------------------------------------------
+
+question: a -b = 4 -2 =2 = 000010
+
+* in addition:
+carry = 0 >>>> no carry
+carry = 1 >>>> carry occurred
+
+
+
+*in subtraction: a + (-b)
+carry = 1 >>>> no carry
+carry = 0 >>>> carry occurred

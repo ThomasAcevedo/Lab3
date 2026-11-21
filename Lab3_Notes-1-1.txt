@@ -1,0 +1,249 @@
+
+	Lab Assignment 3:
+	
+		
+		1- Sub module: Adder
+		2- Sub module: Multiplier
+		3- Sub module: Logic Unit
+		4- Sub module: Shifter
+		
+		5- Top module: ALU Wrapper >>>>>> Including Adder + Multiplier + Logic Unit + Shifter
+		
+		6- Test bench (Simulation)
+		7- Constraints file
+		
+	----------------------------------------------------------
+	
+	
+	
+
+
+		1- Adder:
+		
+			1-1) Addition >>>>>> a + b
+			1-2) Subtraction >>>>>> a - b = a +(-b)
+			
+			
+			Example1)
+			
+				a = 4 (Decimal)>>>>>>>>>> 000100 (binary)	
+				
+				b = 2 (Decimal) >>>>>>>>> 000010 (binary)
+				
+				
+			
+					1-1) Addition: {addition ; carry }
+					
+					
+				
+				a + b = 4 + 2 = 6
+				
+				000100 :(a)
+			+
+				000010 :(b)
+				----------
+				000110 :(6-bits) >>>>>> carry ||  addition result = 0 000110
+					  
+						when s1s0 = 00 >>>>>>> we should write 'addition' result in 6-bits : 000110 : a5a4a3a2a1a0  
+						when s1s0 = 01 >>>>>>> we should write 'carry' result in 6-bits : 000000
+											
+				---------------------------------------------------------------------------------							
+					1-2) Subtraction: { subtraction ; borrow}
+					
+					
+				a - b = 4 - 2 = 4 + (-2) = 2
+				
+				000100 :(a)
+				
+				000010 :(b) >>>>>>>>>>>> (-b) =  : 111101  >>>>>>> + 1 = 111110 : (-b)
+													
+									  it means : (flip (b)         + 1) 
+				
+				
+				000100  (a)
+				
+			+	111110 (-b)
+				------------
+				1000010 (7-bits) >>>>>>>> borrow || subtraction result = 1 000010
+				
+						when s1s0 = 10 >>>>>>> we should write 'subtraction' result in 6-bits : 000010 : a5a4a3a2a1a0  
+						when s1s0 = 11 >>>>>>> we should write 'carry' result in 6-bits : 000001
+
+
+
+
+
+
+
+				* library std_logic_1164
+				* library numeric
+
+
+
+
+				In your VHDL coded inside your dataflow architecture you will need to define these signals:
+					
+				- 1-bit signal >>>>> for carry_sel : selects output_type 
+
+				- 1-bit signal >>>>> for sub       : selects add vs. subtract
+
+
+				- (n+1)-bits >>>>> a_long for extracting (a): extend your input (a)
+
+				- (n+1)-bits >>>>> b_long for extracting (b): extend your input (b)>>>>> (0 & unsigned(not b)) when sub='1' else (0& 						unsigned (b)
+
+
+				- (n)-bits >>>>> carry : std_logic_vector(n-1 downto 0) : for carry/borrow bit
+
+
+				- (n+1)-bits >>>>>> for op1_long : the result of your addition operation : holds (a_long + b_long)
+
+				- (n+1)-bits>>>>>> for op2_long : the result of your subtraction operation: holds a+(-b)+1: a_long + b_long +   						to_unsigned(1,n)   
+					* Important note: to_unsigned(1,n) is '+1' in your two's complement and it contains n-bits unsigned constant '1'
+
+
+				- (n+1)-bits >>>>> for sum_long : selected operation result 
+
+				- (n)-bits >>>>>>> sum : lower n bits 
+
+				- (n+1)-bits >>>>>> carry_long : formatted carry bit ( 0.. 000 & 1-bit carry/ borrow)
+
+
+begin
+
+instantiation using these 10 signals
+
+
+
+										
+											
+--------------------------------------------------------------------------------------
+					
+	2- Multiplier:
+
+		(n-bits) a * (n-bits) b = (2*n)-bits value result 
+
+
+	(6-bits): a
+
+	* 
+	(6-bits): b
+----------------------
+	(12-bits): r
+
+
+
+		* library std_logic_1164
+		* library numeric
+
+
+
+		- Entity:
+			Generic 
+			 port
+
+
+		- Architecture dataflow
+
+			(12-bits) signal : define this signal for whole 12-bits result for the multiplication : (higher bits & lower bits) of our multiplication result
+
+
+		begin
+
+			product <= unsigned (a) * unsigned (b) :12-bits : 6-bit higher & 6-bits lower
+
+
+			with s select
+				.....			
+				
+											
+		Note that in this part, the 's' is 1-bit.
+
+
+-------------------------------------------------------------------------------------------------------
+  		3- Logical Unit:
+
+		library std_logic....
+
+ 
+		entity:
+			Generic
+			port( sel (should have 2-bits , a , b , r)
+
+
+	architecture dataflow 
+		 we wont need to define any signal for the logical unit
+
+
+	begin
+
+		with sel select 
+			r= a and b when "10"
+			.......
+----------------------------------------------------------------------------------------
+
+
+
+		4- Shifter: 
+
+		* note : 'shifting' and 'rotating' are not the same operations.
+
+
+
+        		4-1) shift to the 'left' : (logical or arithmetic shift to the left)
+
+					4-1-1) logical shift to the 'left'
+					4-1-2) arithmetic shift to the 'left'
+
+				* Note: logical shift to the 'left' = arithmetic shift to the 'left'
+
+
+
+			example for logical / arithmetic shift to the left:
+
+					a= 23 (decimal) : 010111 (binary) ---------> shift left by '1' bit : 101110 (binary) : 46 (decimal)
+
+					a= 23 (decimal) : 010111 (binary) ---------> shift left by '2' bit : 011100 (binary) : 69 (decimal)
+
+							......
+
+				* Note: shifting a number to the 'left' by (n-bits) = multiplication that number by (2^n)
+
+
+			-------------------------------------------------------------------------------------------------	
+				
+			4-2) shift to the 'right': 
+
+
+				
+						4-2-1): example for  logical shift to the 'right' :
+
+							a = 23 (decimal) : 010111 (binary) ---------> logical shift to the right : 001011 (binary) : ??? (decimal)
+
+
+							* Note: Logical shifting a number to the 'right' by (n-bits) = dividing that number by (2^n)
+
+
+
+						4-2-2): example for arithmetic shift to the 'right' : 
+							
+							* Note: In the arithmetic shift to the right , the sign of the number is matter.
+							
+
+
+
+ex) for positive numbers :
+a = 23 (decimal) : 010111 (binary) ---> we want to do arithmetic shift to the right by '2' bits:  ---> shift the number to the right by two-bits and then add two '0's to the left : 001011 : 11 (decimal)
+
+
+* Note: Arithmetic shifting a number to the right by (n-bit) = dividing that number by (2^n)
+ 	*** To prove that 11 is half of 23: calculate the two's completement of 11 and 23 , and then floor them. 
+
+
+
+ex) for negative numbers :						
+b = 55 (decimal) : 110111 (binary) --->  we want to do arithmetic shift to the right by '1' bits ---> shift the number to the right by one-bits and then add a '1' to the left : 111011 : 59 (decimal) 
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
