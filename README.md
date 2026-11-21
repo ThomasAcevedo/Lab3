@@ -54,15 +54,17 @@ Add the split design files to Vivado, not `sim.vhd`; the starter file redeclares
 
 ## Vivado step by step
 
-1. Create a new **RTL Project** in Vivado. Select the FPGA board/device required by your course. The PDF's final page maps logical I/O to switches and LEDs, but does not provide FPGA package pin names.
+1. Create a new **RTL Project** in Vivado. For a Nexys 4 DDR Rev. C board, select the board if it appears in the board list, or select FPGA part `xc7a100tcsg324-1` (the Artix-7 device used on this board).
 2. Add `adder.vhd` as a **Design Source**. Read its short comments and trace the widened sum and two's-complement subtraction to understand how it produces result, carry, and borrow.
 3. Add `shifter.vhd` and simulate/inspect the three shift modes. It uses the low three bits of the top-level `b` operand as the shift amount.
 4. Add `mult.vhd` and `logicunit.vhd`, then inspect their `sel` behavior against the select table above.
 5. Add `alu.vhd` last. It instantiates those four units and routes the result based on `sel(3 downto 2)`. Vivado can resolve the direct entity instantiations once all five design files are in the project.
 6. Add `alu_testbench.vhd` under **Simulation Sources** and set `alu_testbench` as the simulation top. Run **Run Behavioral Simulation**. Each of the 48 select/vector cases is checked with an assertion; a mismatch is reported as an error, and a passing run reports that all vectors passed. The original separate benches are in `sim.vhd` for reference, but do not add that combined starter file because it redeclares the design entities.
 7. For hardware demonstration, connect the top-level ports as the PDF specifies: `sel` to switches 15–12, `a` to switches 11–6, `b` to switches 5–0, and `r` to LEDs 5–0.
-8. Create an `.xdc` using the master constraints file for the exact board/revision. Assign the switch and LED logical ports to their actual FPGA package pins and set the board-required I/O standards. The PDF does not identify the board or list package pin names, so those assignments cannot safely be filled in from the provided files alone.
-9. Synthesize/program the board for the demo. The assignment explicitly says **not** to collect timing results.
+8. Add `constraints/Nexys4DDR.xdc` as a **Constraints** source. It maps the lab's `sel`, `a`, and `b` inputs to SW15–SW0 and `r` to LED5–LED0. The pin numbers and I/O standards are based on Digilent's Nexys4 DDR Rev. C master XDC. SW8 and SW9 use LVCMOS18, matching the board file. If your board has a different revision, compare its master XDC before programming.
+9. In the Sources pane, right-click `alu` and choose **Set as Top**. Run **Run Synthesis**, then **Run Implementation**, then **Generate Bitstream**. No clock or timing constraints are needed for this combinational lab; the assignment says not to collect timing results.
+10. Connect the board to the PC with the USB cable at its USB-JTAG/PROG connector (J6), turn on board power, and open **Open Hardware Manager** → **Open Target** → **Auto Connect**. Choose **Program Device** and select the generated `.bit` file. The board reference manual describes programming through its USB-JTAG circuitry.
+11. Set switch positions for `sel`, `a`, and `b`. The ALU is combinational, so the six result LEDs should update as you move the switches; no clock or button press is needed. For a quick check, set `a=000100` by turning SW8 on, `b=000010` by turning SW1 on, and `sel=0000` by leaving SW15–SW12 off. The result is `000110`, so LED2 and LED1 should light. Change `sel` to `0001` (turn SW12 on) to display the addition carry instead.
 
 Keep the implementation at the level of the course examples: one-bit carry signals, widened unsigned arithmetic, `case`/`with-select` muxes, simple bitwise operations, and the built-in shift operations. No advanced arithmetic architecture is needed.
 
@@ -78,4 +80,5 @@ Keep the implementation at the level of the course examples: one-bit carry signa
 - `logicunit.vhd` — bitwise logic unit.
 - `alu.vhd` — structural top-level wrapper.
 - `alu_testbench.vhd` — self-checking testbench for all required inputs and operations.
+- `constraints/Nexys4DDR.xdc` — Nexys 4 DDR Rev. C pin constraints for the lab I/O map.
 - `lab3_example_for_adder.txt` — worked adder/subtractor example.
