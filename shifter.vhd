@@ -1,5 +1,8 @@
--- Six-bit shifter. b supplies the three-bit shift amount.
--- sel=00/01 left, sel=10 logical right, sel=11 arithmetic right.
+-- SHIFTER
+-- b is a three-bit shift amount for the six-bit input a.
+-- sel = 00 or 01: shift left, filling new bits with zeros
+-- sel = 10:       logical shift right, filling with zeros
+-- sel = 11:       arithmetic shift right, copying the sign bit
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -18,10 +21,12 @@ entity shifter is
 end entity shifter;
 
 architecture dataflow of shifter is
+    -- VHDL shift functions take the shift amount as an integer.
     signal amount : natural range 0 to 2**m-1;
 begin
     amount <= to_integer(unsigned(b));
 
+    -- unsigned(a) shifts in zeros; signed(a) repeats a's sign bit on right shift.
     with sel select
         r <= std_logic_vector(shift_left(unsigned(a), amount))  when "00",
              std_logic_vector(shift_left(unsigned(a), amount))  when "01",

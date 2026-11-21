@@ -1,4 +1,7 @@
--- Bitwise logic unit. sel: NOT, AND, OR, XOR.
+-- LOGIC UNIT
+-- These are bit-by-bit operations across all n bits.
+-- sel = 00: NOT a    sel = 01: a AND b
+-- sel = 10: a OR b   sel = 11: a XOR b
 library ieee;
 use ieee.std_logic_1164.all;
 
@@ -14,6 +17,7 @@ end entity logic_unit;
 
 architecture dataflow of logic_unit is
 begin
+    -- The selected bitwise operation directly drives the result.
     with sel select
         r <= not a          when "00",
              a and b        when "01",
