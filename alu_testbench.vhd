@@ -32,10 +32,10 @@ architecture test of alu_testbench is
     begin
         case operation is
             when "0000" =>
-                wide_sum := ('0' & unsigned(left_arg)) + ('0' & unsigned(right_arg));
+                wide_sum := unsigned('0' & left_arg) + unsigned('0' & right_arg);
                 return std_logic_vector(wide_sum(5 downto 0));
             when "0001" =>
-                wide_sum := ('0' & unsigned(left_arg)) + ('0' & unsigned(right_arg));
+                wide_sum := unsigned('0' & left_arg) + unsigned('0' & right_arg);
                 return "00000" & std_logic(wide_sum(6));
             when "0010" =>
                 return std_logic_vector(unsigned(left_arg) - unsigned(right_arg));

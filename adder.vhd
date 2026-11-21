@@ -18,10 +18,10 @@ architecture dataflow of adder is
     signal add_wide : unsigned(n downto 0);
     signal sub_wide : unsigned(n downto 0);
 begin
-    add_wide <= ('0' & unsigned(a)) + ('0' & unsigned(b));
+    add_wide <= unsigned('0' & a) + unsigned('0' & b);
     -- a + not(b) + 1 is two's-complement subtraction. Its top bit is
     -- the no-borrow carry, so the requested borrow output is its inverse.
-    sub_wide <= ('0' & unsigned(a)) + ('0' & not b) + to_unsigned(1, n+1);
+    sub_wide <= unsigned('0' & a) + unsigned('0' & (not b)) + to_unsigned(1, n+1);
 
     with sel select
         r <= std_logic_vector(add_wide(n-1 downto 0)) when "00",
